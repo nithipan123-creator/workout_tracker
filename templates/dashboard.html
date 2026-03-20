@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-header text-center" style="margin-bottom: 2rem;">
+    <h1>Welcome back to FitTrack</h1>
+    <p style="color: var(--text-secondary);">Here's a breakdown of your progress.</p>
+</div>
+
+<div class="grid-2">
+    <!-- Volume over time Chart -->
+    <div class="card">
+        <h3>Workout Volume Trend</h3>
+        <canvas id="volumeChart" width="400" height="250"></canvas>
+    </div>
+
+    <!-- Personal Records -->
+    <div class="card">
+        <h3>Personal Records</h3>
+        {% if prs %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Exercise</th>
+                    <th>Max Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exercise, max_weight in prs %}
+                <tr>
+                    <td>{{ exercise }}</td>
+                    <td><span style="color: var(--success); font-weight: 600;">{{ max_weight }} kg</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color: var(--text-secondary);">No personal records yet. Log your first workout!</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3>Recent Workouts</h3>
+    {% if recent_workouts %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Exercise</th>
+                    <th>Weight</th>
+                    <th>Volume</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for workout in recent_workouts %}
+                <tr>
+                    <td>{{ workout.date.strftime('%b %d, %Y') }}</td>
+                    <td>{{ workout.exercise_name }}</td>
+                    <td>{{ workout.weight }} kg</td>
+                    <td><span style="color: var(--accent-color); font-weight: 500;">{{ workout.total_volume }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color: var(--text-secondary);">No recent workouts documented. Start logging!</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/chart_data')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('volumeChart').getContext('2d');
+                
+                // Get theme colors to make chart match theme
+                const isLightMode = document.body.classList.contains('light-mode');
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Daily Volume (kg)',
+                            data: data.data,
+                            borderColor: '#bb86fc', // Accent color
+                            backgroundColor: 'rgba(187, 134, 252, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#03dac6', // Success color
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: isLightMode ? '#555555' : '#aaaaaa' 
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: isLightMode ? '#e0e0e0' : '#333333'
+                                },
+                                ticks: {
+                                    color: isLightMode ? '#555555' : '#aaaaaa'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: isLightMode ? '#e0e0e0' : '#333333'
+                                },
+                                ticks: {
+                                    color: isLightMode ? '#555555' : '#aaaaaa'
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    });
+</script>
+{% endblock %}
