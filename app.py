@@ -7,9 +7,13 @@ from datetime import datetime
 # Initialize the Flask application
 app = Flask(__name__)
 
-# Configure the SQLite database path (stores data in workouts.db in the same folder)
+# Configure the SQLite database path
+# Uses DATABASE_URL from environment if set, allowing persistent disk storage in production.
+# Falls back to local workouts.db for development.
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'workouts.db')
+db_path = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'workouts.db'))
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'super_secret_key_for_flash_messages' # Needed for displaying 'flash' alerts
 
@@ -134,5 +138,6 @@ def chart_data():
     return {'labels': labels, 'data': data}
 
 if __name__ == '__main__':
-    # Start the Flask development server on http://127.0.0.1:5000
-    app.run(debug=True)
+    # Start the Flask app for production
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
