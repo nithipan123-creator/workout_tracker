@@ -25,7 +25,7 @@ Make sure you have [Python 3](https://www.python.org/downloads/) installed on yo
 
 1. **Clone the repository** (if you haven't already):
    ```bash
-   git clone <YOUR_GITHUB_REPO_URL>
+   git clone https://github.com/nithipan123-creator/workout_tracker.git
    cd workout-tracker
    ```
 
