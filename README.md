@@ -113,14 +113,3 @@ Here are a few technical and feature upgrades planned for the future:
 6. **Integration Testing**: Add comprehensive unit and integration tests using `pytest` to ensure application stability.
 
 ---
-
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard Screenshot](dashboard.png)
-
-### Add Workout
-![Add Workout Screenshot](add_workout.png)
-
-### Workout History
-![History Screenshot](history.png)
